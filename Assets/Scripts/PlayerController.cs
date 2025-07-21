@@ -8,7 +8,8 @@ public class PlayerController : MonoBehaviour
     public bool isMoving;
     private Vector2 input;
     private Animator animator;
-
+    public LayerMask solidObjectsLayer;
+    public LayerMask interactableLayer;
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -33,13 +34,39 @@ public class PlayerController : MonoBehaviour
                 var targetPos = transform.position;
                 targetPos.x += input.x;
                 targetPos.y += input.y;
-                StartCoroutine(Move(targetPos));
+
+                if(isWalkable(targetPos)) StartCoroutine(Move(targetPos));
 
             }
         }
         animator.SetBool("isMoving", isMoving);
+
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            Interact();
+        }
     }
 
+    void Interact()
+    {
+        var facingDir = new Vector3(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
+        var interactPos = transform.position + facingDir;
+        //Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
+        var collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactableLayer);
+        if(collider != null)
+        {
+            Debug.Log("There is an NPC Yigit!!");
+        }
+
+    }
+    private bool isWalkable(Vector3 targetPos)
+    {
+        if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer | interactableLayer) != null)
+        {
+            return false;
+        }
+        else return true;
+    }
     IEnumerator Move(Vector3 targetPos)
     {
         isMoving = true;
