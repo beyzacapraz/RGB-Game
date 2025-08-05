@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class NpcYigitController : MonoBehaviour, Interactable
 {
+    [SerializeField] Dialog dialog;
     public void Interact()
     {
-        Debug.Log("You will talk to this NPCYigit");
+        StartCoroutine(DialogManager.Instance.ShowDialog(dialog));
     }
 }
